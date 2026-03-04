@@ -1,0 +1,338 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct rbtNode
+{
+   int key;
+   char color;
+   struct rbtNode *left;
+   struct rbtNode*right;
+   struct rbtNode*parent;
+};
+struct rbtNode* root = NULL;
+
+void leftRotate(struct rbtNode *x)
+{
+   struct rbtNode *y;
+   y = x->right;  x->right = y->left;
+   if( y->left != NULL)
+   {
+      y->left->parent = x;
+   }
+   y->parent = x->parent;
+   if( x->parent == NULL)
+   {
+      root = y;
+   }
+   else if( (x->parent->left!=NULL) && (x->key == x->parent->left->key))
+   {
+      x->parent->left = y;
+   }
+   else
+      x->parent->right = y;
+   y->left = x; x->parent = y; return;
+}
+
+void rightRotate(struct rbtNode *y)
+{
+   struct rbtNode *x;
+   x = y->left; y->left = x->right;
+   if ( x->right != NULL)
+   {
+      x->right->parent = y;
+   }
+   x->parent = y->parent;
+   if( y->parent == NULL)
+   {
+      root = x;
+   }
+   else if((y->parent->left!=NULL)&& (y->key == y->parent->left->key))
+   {
+      y->parent->left = x;
+   }
+   else
+      y->parent->right = x;
+   x->right = y; y->parent = x;
+return;
+}
+
+int search(int val)
+{
+   struct rbtNode* temp = root;
+   int diff;
+   while (temp != NULL)
+   {
+      diff = val - temp->key;
+      if (diff > 0)
+      {
+         temp = temp->right;
+      }
+      else if (diff < 0)
+      {
+         temp = temp->left;
+      }
+      else
+      {
+         printf("Search Element Found!!\n");\
+            return 1;
+      }
+   }
+   printf("Given Data Not Found in RB Tree!!\n");
+   return 0;
+}
+
+void colorinsert(struct rbtNode *z)
+{
+   struct rbtNode *y=NULL;
+   while ((z->parent != NULL) && (z->parent->color == 'r'))
+   {
+      if ( (z->parent->parent->left != NULL) && (z->parent->key == z->parent->parent->left->key))
+      {
+         if(z->parent->parent->right!=NULL)
+            y = z->parent->parent->right;
+         if ((y!=NULL) && (y->color == 'r'))
+         {
+            z->parent->color = 'b';
+            y->color = 'b';
+            z->parent->parent->color = 'r';
+            if(z->parent->parent!=NULL)
+               z = z->parent->parent;
+         }
+         else
+         {
+            if ((z->parent->right != NULL) && (z->key == z->parent->right->key))
+            {
+               z = z->parent;
+               leftRotate(z);
+            }
+            z->parent->color = 'b';
+            z->parent->parent->color = 'r';
+            rightRotate(z->parent->parent);
+         }
+      }
+      else
+      {
+         if(z->parent->parent->left!=NULL)
+            y = z->parent->parent->left;
+         if ((y!=NULL) && (y->color == 'r'))
+         {
+            z->parent->color = 'b';
+            y->color = 'b';
+            z->parent->parent->color = 'r';
+            if(z->parent->parent!=NULL)
+               z = z->parent->parent;
+         }
+         else
+         {
+            if ((z->parent->left != NULL) && (z->key == z->parent->left->key))
+            {
+               z = z->parent;
+               rightRotate(z);
+            }
+            z->parent->color = 'b';
+            z->parent->parent->color = 'r';
+            leftRotate(z->parent->parent);
+         }
+      }
+   }
+   root->color = 'b';
+}
+
+void insert(int val)
+{
+   struct rbtNode *x, *y;
+   struct rbtNode *z = (struct rbtNode*)malloc(sizeof(struct rbtNode));
+   z->key = val;
+   z->left = NULL;
+   z->right = NULL;
+   z->color = 'r';
+   x=root;
+   if(search(val)==1)
+   {
+      printf("\nEntered element already exists in the tree\n");
+      return;
+   }
+   if ( root == NULL )
+   {
+      root = z;
+      root->color = 'b';
+      return;
+   }
+   while ( x != NULL)
+   {
+      y = x;
+
+      if ( z->key < x->key)
+      {
+         x = x->left;
+      }
+      else x = x->right;
+   }
+   z->parent = y;
+   if ( y == NULL)
+   {
+      root = z;
+   }
+   else if( z->key < y->key )
+   {
+      y->left = z;
+   }
+   else
+      y->right = z;
+   colorinsert(z);
+   return;
+}
+
+void inorderTree(struct rbtNode* root)
+{
+   struct rbtNode* temp = root;
+   if (temp != NULL)
+   {
+      inorderTree(temp->left);
+      printf(" %d--%c ",temp->key,temp->color);
+      inorderTree(temp->right);
+   }
+   return;
+}
+
+void postorderTree(struct rbtNode* root)
+{
+   struct rbtNode* temp = root;
+   if (temp != NULL)
+   {
+      postorderTree(temp->left);
+      postorderTree(temp->right);
+      printf(" %d--%c ",temp->key,temp->color);
+   }
+   return;
+}
+
+void traversal(struct rbtNode* root)
+{
+   if (root != NULL)
+   {
+      printf("root is %d-- %c",root->key,root->color);
+      printf("\nInorder tree traversal\n");
+      inorderTree(root);
+      printf("\npostorder tree traversal\n");
+      postorderTree(root);
+   }
+   return;
+}
+
+int main()
+{
+   int choice,val,data,var,fl=0;
+   while(1)
+   {
+      printf("\n****Red Black Tree Management ****\n");
+      printf("\n1.Insert\n2.Traversal\n3.Exit\n");
+      scanf("%d",&choice);
+      switch(choice)
+      {
+         case 1:
+            printf("Enter the integer you want to add : ");
+            scanf("%d",&val);
+            insert(val);
+            break;
+         case 2:
+            traversal(root);
+            break;
+         case 3:
+            fl=1;
+            break;
+         default:
+            printf("\nInvalid Choice\n");
+      }
+      if(fl==1)
+      {
+         break;
+      }
+  }
+return 0;
+}
+
+[23bit088@mepcolinux ~]$cc redblack.c
+[23bit088@mepcolinux ~]$./a.out
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 23
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 56
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 78
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 88
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 90
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 45
+Given Data Not Found in RB Tree!!
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+1
+Enter the integer you want to add : 88
+Search Element Found!!
+
+Entered element already exists in the tree
+
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+2
+root is 56-- b
+Inorder tree traversal
+ 23--b  45--r  56--b  78--r  88--b  90--r
+postorder tree traversal
+ 45--r  23--b  78--r  90--r  88--b  56--b
+****Red Black Tree Management ****
+
+1.Insert
+2.Traversal
+3.Exit
+3
