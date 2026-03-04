@@ -1,0 +1,235 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+typedef struct node *list;
+
+list createNode(int x) {
+    list temp = (list)malloc(sizeof(struct node));
+    temp->data = x;
+    temp->next = NULL;
+    return temp;
+}
+
+void insert(int x, int pos, list head);
+void delete(int x, list head);
+int search(int x, list head);
+int locate(int x, list head);
+void retrieve(int pos, list head);
+void display(list head);
+void prime(list head);
+int isempty(list head);
+void makeempty(list head);
+
+int main() {
+    list head = createNode(0);  // dummy head
+    head->next = NULL;
+    int choice, x, pos;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Insert\n");
+        printf("2. Delete\n");
+        printf("3. Search\n");
+        printf("4. Locate\n");
+        printf("5. Retrieve\n");
+        printf("6. Display\n");
+        printf("7. Display Prime Numbers\n");
+        printf("8. Check if List is Empty\n");
+        printf("9. Make List Empty\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the value to insert: ");
+                scanf("%d", &x);
+                printf("Enter the position to insert at: ");
+                scanf("%d", &pos);
+                insert(x, pos, head);
+                break;
+            case 2:
+                printf("Enter the value to delete: ");
+                scanf("%d", &x);
+                delete(x, head);
+                break;
+            case 3:
+                printf("Enter the value to search: ");
+                scanf("%d", &x);
+                if (search(x, head))
+                    printf("Element found.\n");
+                else
+                    printf("Element not found.\n");
+                break;
+            case 4:
+                printf("Enter the value to locate: ");
+                scanf("%d", &x);
+                pos = locate(x, head);
+                if (pos != -1)
+                    printf("Element found at position %d.\n", pos);
+                else
+                    printf("Element not found.\n");
+                break;
+            case 5:
+                printf("Enter the position to retrieve from: ");
+                scanf("%d", &pos);
+                retrieve(pos, head);
+                break;
+            case 6:
+                display(head);
+                break;
+            case 7:
+                prime(head);
+                break;
+            case 8:
+                if (isempty(head))
+                    printf("List is empty.\n");
+                else
+                    printf("List is not empty.\n");
+                break;
+            case 9:
+                makeempty(head);
+                printf("List has been emptied.\n");
+                break;
+            case 0:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 0);
+
+    makeempty(head);  // Clean up before exiting
+    free(head);
+    return 0;
+}
+
+void insert(int x, int pos, list head) {
+    list t = head;
+    list temp;
+    temp = createNode(x);
+    int i;
+
+    for (i = 1; i < pos && t != NULL; i++) {
+        t = t->next;
+    }
+
+    if (t != NULL) {
+        temp->next = t->next;
+        t->next = temp;
+    } else {
+        printf("Position out of range\n");
+    }
+}
+
+void delete(int x, list head) {
+    list t, k;
+    t = head;
+
+    while (t->next != NULL && t->next->data != x) {
+        t = t->next;
+    }
+
+    if (t->next != NULL) {
+        k = t->next;
+        t->next = k->next;
+        free(k);
+        printf("Deleted\n");
+    } else {
+        printf("Element not present\n");
+    }
+}
+
+int search(int x, list head) {
+    list t = head->next;
+
+    while (t != NULL) {
+        if (t->data == x) {
+            return 1;
+        }
+        t = t->next;
+    }
+
+    return 0;
+}
+
+int locate(int x, list head) {
+    list t = head->next;
+    int pos = 1;
+
+    while (t != NULL) {
+        if (t->data == x) {
+            return pos;
+        }
+        t = t->next;
+        pos++;
+    }
+
+    return -1;
+}
+
+void retrieve(int pos, list head) {
+    list t = head->next;
+    int p = 1;
+
+    while (t != NULL) {
+        if (p == pos) {
+            printf("%d\n", t->data);
+            return;
+        }
+        t = t->next;
+        p++;
+    }
+    printf("Position out of range\n");
+}
+
+void display(list head) {
+    list t = head->next;
+
+    while (t != NULL) {
+        printf("%d -> ", t->data);
+        t = t->next;
+    }
+    printf("NULL\n");
+}
+
+void prime(list head) {
+    list t = head->next;
+
+    while (t != NULL) {
+        int flag = 0;
+        if (t->data <= 1) {
+            t = t->next;
+            continue;
+        }
+        int i;
+        for ( i = 2; i <= t->data / 2; i++) {
+            if (t->data % i == 0) {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag == 0) {
+            printf("%d is prime\n", t->data);
+        }
+        t = t->next;
+    }
+}
+
+int isempty(list head) {
+    return head->next == NULL;
+}
+
+void makeempty(list head) {
+    list t;
+
+    while (head->next != NULL) {
+        t = head->next;
+        head->next = t->next;
+        free(t);
+    }
+}
