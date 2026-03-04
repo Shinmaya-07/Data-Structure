@@ -1,0 +1,201 @@
+//bst.h
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node
+{
+   int data;
+   struct node*left;
+   struct node*right;
+
+};
+
+typedef struct node*bst;
+bst insert(int x , bst t);
+bst delete(int x , bst t);
+bst createnode(int x);
+bst search(int x , bst);
+bst findmin(bst t);
+bst findmax(bst t);
+int height(bst t);
+void inorder(bst t);
+void preorder(bst t);
+void postorder(bst t);
+
+
+//bsti.c
+#include"bst.h"
+bst createnode(int x)
+{
+   bst newnode=(bst)malloc(sizeof(struct node));
+   newnode->data=x;
+   newnode->left=NULL;
+   newnode->right=NULL;
+   return newnode;
+}
+
+bst insert(int x, bst t)
+{
+   if(t==NULL)
+      return createnode(x);
+   else
+   {
+      if(x < t->data)
+         t->left = insert(x , t->left);
+       if(x > t->data)
+         t->right = insert(x , t->right);
+   }
+   return t;
+}
+
+bst delete(int x , bst t)
+{
+   if(t==NULL)
+      printf("TREE IS EMPTY");
+   if(x < t->data)
+      t->left=delete(x , t->left);
+   else if(x> t->data)
+      t->right=delete(x , t->right);
+   else if(t->left!=NULL && t->right!=NULL)
+   {
+      bst temp = findmin(t->right);
+      t->data = temp->data;
+      t->right = delete(temp->data , t->right);
+   }
+   else
+   {
+      bst temp = t;
+      if(t->left == NULL)
+         t = t->right;
+      if(t->right == NULL)
+         t = t->left;
+      if(temp == t)
+         t=NULL;
+      free(temp);
+   }
+   return t;
+}
+
+bst findmin(bst t)
+{
+   while(t->left != NULL)
+      t = t->left;
+   return t;
+}
+
+bst findmax(bst t)
+{
+   while(t->right != NULL)
+      t = t->right;
+   return t;
+}
+
+bst search(int x , bst t)
+{
+   if(t == NULL)
+      printf("\nElement not found");
+   else if(x < t->data)
+      return search(x , t->left);
+   else if(x > t->data)
+      return search(x , t->right);
+   else if(x == t->data)
+      printf("\nElement Found");
+   return t;
+}
+
+int height(bst t)
+{
+   if (t == NULL)
+      return  0;
+   else
+   {
+      int lh = height(t->left)+1;
+      int rh = height(t->right)+1;
+      if(lh > rh)
+         return lh;
+      else
+         return rh;
+   }
+}
+
+void inorder(bst t)
+{
+   if(t != NULL)
+   {
+      inorder(t->left);
+      printf(" %d ",t->data);
+      inorder(t->right);
+   }
+}
+
+void preorder(bst t)
+{
+   if(t != NULL)
+   {
+      printf(" %d ",t->data);
+      preorder(t->left);
+      preorder(t->right);
+   }
+}
+
+void postorder(bst t)
+{
+   if(t != NULL)
+   {
+      postorder(t->left);
+      postorder(t->right);
+      printf(" %d ",t->data);
+   }
+}
+
+
+//bsta.c
+#include"bst.h"
+int main()
+{
+   int ch,value;
+   bst t = (bst)malloc(sizeof(bst));
+   do{
+   printf("\n------BINARY SEARCH TREE------\n");
+   printf("1. Insert\n2. Delete\n3. Search\n4. Inorder\n5. Preorder\n6. Postorder\n7. Exit\n");
+   printf("Enter your choice = ");
+   scanf("%d",&ch);
+   switch(ch)
+   {
+      case 1:
+         printf("Enter the value to insert = ");
+         scanf("%d",&value);
+         insert(value , t);
+         printf("value is inserted");
+         break;
+      case 2:
+         printf("Enter the value to delete = ");
+         scanf("%d",&value);
+         delete(value , t);
+         printf("value is deleted");
+         break;
+      case 3:
+         printf("Enter the value to search = ");
+         scanf("%d",&value);
+         search(value , t);
+         break;
+     case 4:
+        inorder(t);
+        break;
+     case 5:
+        preorder(t);
+        break;
+     case 6:
+        postorder(t);
+        break;
+     case 7:
+        printf("EXITING ...");
+        break;
+     default:
+        printf("Invalid choice");
+
+    }
+
+   }while(ch!=7);
+   return 0;
+}
