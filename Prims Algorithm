@@ -1,0 +1,162 @@
+Prims - C programming
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node
+{
+    int adj;
+    int cost;
+    struct node* next;
+};
+typedef struct node* list;
+
+struct graphentry
+{
+    int nov;
+    list* array;
+};
+typedef struct graphentry* graph;
+
+struct tableentry
+{
+    int known;
+    int dist;
+    int path;
+};
+typedef struct tableentry* table;
+
+graph init(int n)
+{
+    int i;
+    graph g = (graph)malloc(sizeof(struct graphentry));
+    g->nov = n;
+    g->array = (list*)malloc((n + 1) * sizeof(list));
+    for (i = 1; i <= n; i++)
+    {
+        g->array[i] = NULL;
+    }
+    return g;
+}
+
+void readgraph(graph g)
+{
+    list temp;
+    int i;
+    int a, ch, c;
+    for (i = 1; i <= g->nov; i++)
+    {
+        do
+        {
+            printf("Add adjacent vertex to vertex %d (1 for yes, 0 for no): ", i);
+            scanf("%d", &ch);
+            if (ch == 1)
+            {
+                printf("Enter adjacent vertex and cost: ");
+                scanf("%d %d", &a, &c);
+                temp = (list)malloc(sizeof(struct node));
+                temp->adj = a;
+                temp->cost = c;
+                temp->next = g->array[i];
+                g->array[i] = temp;
+            }
+        } while (ch == 1);
+    }
+}
+
+table tinit(graph g)
+{
+   int i;
+    table t = (table)malloc((g->nov + 1) * sizeof(struct tableentry));
+    for (i = 1; i <= g->nov; i++)
+    {
+        t[i].known = 0;
+        t[i].dist = 9999;
+        t[i].path = -1;
+    }
+    t[1].dist = 0;
+    return t;
+}
+
+int dista(table t, int n)
+{
+   int i;
+    int minDist = 9999, minIndex = -1;
+    for (i = 1; i <= n; i++)
+    {
+        if (!t[i].known && t[i].dist < minDist)
+        {
+            minDist = t[i].dist;
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+
+void prim(table t, graph g)
+{
+    int i;
+    int v, w;
+    for (i = 1; i <= g->nov; i++)
+    {
+        v = dista(t, g->nov);
+        if (v == -1) break;
+        t[v].known = 1;
+        list l = g->array[v];
+        while (l != NULL)
+        {
+            w = l->adj;
+
+            if (!t[w].known && l->cost < t[w].dist)
+            {
+                t[w].dist = l->cost;
+                t[w].path = v;
+            }
+            l = l->next;
+        }
+    }
+}
+
+void display(table t, graph g)
+{
+   int i;
+    printf("\nVertex\tKnown\tDist\tPath\n");
+    for (i = 1; i <= g->nov; i++)
+    {
+        printf("%d\t%d\t%d\t%d\n", i, t[i].known, t[i].dist, t[i].path);
+    }
+    printf("\nEdges in the MST:\n");
+    for (i = 2; i <= g->nov; i++)
+    {
+        printf("Edge: %d - %d with cost %d\n", i, t[i].path, t[i].dist);
+    }
+}
+
+int main()
+{
+    int n,i;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    graph g = init(n);
+    readgraph(g);
+
+    table t = tinit(g);
+    prim(t, g);
+    display(t, g);
+
+    free(t);
+    for (i = 1; i <= n; i++)
+    {
+        list temp;
+        while (g->array[i] != NULL)
+        {
+            temp = g->array[i];
+            g->array[i] = g->array[i]->next;
+            free(temp);
+        }
+    }
+    free(g->array);
+    free(g);
+
+    return 0;
+}
