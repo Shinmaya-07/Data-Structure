@@ -1,0 +1,384 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int key;
+    struct Node *left, *right;
+};
+
+struct Node* newNode(int key) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->key = key;
+    node->left = node->right = NULL;
+    return node;
+}
+
+struct Node* rightRotate(struct Node* x) {
+    struct Node* y = x->left;
+    x->left = y->right;
+    y->right = x;
+    return y;
+}
+
+struct Node* leftRotate(struct Node* x) {
+    struct Node* y = x->right;
+    x->right = y->left;
+    y->left = x;
+    return y;
+}
+
+struct Node* splay(struct Node* root, int key) {
+
+    if (root == NULL || root->key == key)
+        return root;
+
+    if (root->key > key) {
+
+        if (root->left == NULL) return root;
+
+        if (root->left->key > key) {
+            root->left->left = splay(root->left->left, key);
+
+
+            root = rightRotate(root);
+        }
+
+        else if (root->left->key < key) {
+            root->left->right = splay(root->left->right, key);
+
+
+            if (root->left->right != NULL)
+                root->left = leftRotate(root->left);
+        }
+
+        return (root->left == NULL) ? root : rightRotate(root);
+    }
+
+    else {
+
+        if (root->right == NULL) return root;
+
+
+        if (root->right->key > key) {
+            root->right->left = splay(root->right->left, key);
+
+
+            if (root->right->left != NULL)
+                root->right = rightRotate(root->right);
+        }
+
+        else if (root->right->key < key) {
+            root->right->right = splay(root->right->right, key);
+
+
+            root = leftRotate(root);
+        }
+
+
+        return (root->right == NULL) ? root : leftRotate(root);
+    }
+}
+
+
+struct Node* insert(struct Node* root, int key) {
+
+    if (root == NULL) return newNode(key);
+
+
+    root = splay(root, key);
+
+
+    if (root->key == key) return root;
+
+
+    struct Node* node = newNode(key);
+
+
+    if (root->key > key) {
+        node->right = root;
+        node->left = root->left;
+        root->left = NULL;
+    }
+
+    else {
+        node->left = root;
+        node->right = root->right;
+        root->right = NULL;
+    }
+
+    return node;
+}
+
+
+struct Node* deleteKey(struct Node* root, int key) {
+    if (root == NULL) return NULL;
+
+    root = splay(root, key);
+
+
+    if (root->key != key) return root;
+
+
+    struct Node* temp;
+    if (root->left == NULL) {
+        temp = root;
+        root = root->right;
+    } else {
+        temp = root;
+        root = splay(root->left, key);
+        root->right = temp->right;
+    }
+
+    free(temp);
+    return root;
+}
+
+
+struct Node* search(struct Node* root, int key) {
+    return splay(root, key);
+}
+
+
+void inOrder(struct Node* root) {
+    if (root != NULL) {
+        inOrder(root->left);
+        printf("%d ", root->key);
+        inOrder(root->right);
+    }
+}
+
+
+void preOrder(struct Node* root) {
+    if (root != NULL) {
+        printf("%d ", root->key);
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+
+void postOrder(struct Node* root) {
+    if (root != NULL) {
+        postOrder(root->left);
+        postOrder(root->right);
+        printf("%d ", root->key);
+    }
+}
+
+
+int main() {
+    struct Node* root = NULL;
+    int choice, key;
+
+    while (1) {
+        printf("\nSplay Tree Operations:\n");
+        printf("1. Insert\n");
+        printf("2. Delete\n");
+        printf("3. Search\n");
+        printf("4. In-order Traversal\n");
+        printf("5. Pre-order Traversal\n");
+        printf("6. Post-order Traversal\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter key to insert: ");
+                scanf("%d", &key);
+                root = insert(root, key);
+                break;
+            case 2:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+                root = deleteKey(root, key);
+                break;
+            case 3:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+                root = search(root, key);
+                if (root != NULL && root->key == key)
+                    printf("Key found: %d\n", key);
+                else
+                    printf("Key not found\n");
+                break;
+            case 4:
+                printf("In-order Traversal: ");
+                inOrder(root);
+                printf("\n");
+                break;
+            case 5:
+                printf("Pre-order Traversal: ");
+                preOrder(root);
+                printf("\n");
+                break;
+            case 6:
+                printf("Post-order Traversal: ");
+                postOrder(root);
+                printf("\n");
+                break;
+            case 7:
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+[23bit088@mepcolinux ~]$cc splay1.c
+[23bit088@mepcolinux ~]$./a.out
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 2
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 4
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 5
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 88
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 56
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 45
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 9
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 3
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 3
+Enter key to search: 88
+Key found: 88
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 3
+Enter key to search: 44
+Key not found
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 2
+Enter key to delete: 4
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 5
+Pre-order Traversal: 3 2 5 9 88 45 56
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 6
+Post-order Traversal: 2 56 45 88 9 5 3
+
+Splay Tree Operations:
+1. Insert
+2. Delete
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 7
