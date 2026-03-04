@@ -1,0 +1,344 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node
+{
+    int key;
+    struct Node *left, *right;
+};
+
+struct Node* newNode(int key)
+{
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->key = key;
+    node->left = node->right = NULL;
+    return node;
+}
+
+struct Node* merge(struct Node* h1, struct Node* h2)
+{
+    if (h1 == NULL) return h2;
+    if (h2 == NULL) return h1;
+
+    if (h1->key > h2->key)
+    {
+        struct Node* temp = h1;
+        h1 = h2;
+        h2 = temp;
+    }
+
+    struct Node* temp = h1->right;
+    h1->right = h1->left;
+    h1->left = merge(temp, h2);
+
+    return h1;
+}
+
+struct Node* insert(struct Node* root, int key)
+{
+    struct Node* node = newNode(key);
+    return merge(root, node);
+}
+
+struct Node* deleteRoot(struct Node* root)
+{
+    if (root == NULL) {
+        printf("Heap is empty.\n");
+        return NULL;
+    }
+
+    struct Node* newRoot = merge(root->left, root->right);
+    free(root);
+    return newRoot;
+}
+
+int search(struct Node* root, int key)
+{
+    if (root == NULL) return 0;
+    if (root->key == key) return 1;
+    return search(root->left, key) || search(root->right, key);
+}
+
+void inOrder(struct Node* root)
+{
+    if (root == NULL) return;
+    inOrder(root->left);
+    printf("%d ", root->key);
+    inOrder(root->right);
+}
+
+void preOrder(struct Node* root)
+{
+    if (root == NULL) return;
+    printf("%d ", root->key);
+    preOrder(root->left);
+    preOrder(root->right);
+}
+
+void postOrder(struct Node* root)
+{
+    if (root == NULL) return;
+    postOrder(root->left);
+    postOrder(root->right);
+    printf("%d ", root->key);
+}
+
+int main()
+{
+    struct Node* root = NULL;
+    int choice, key;
+
+    while (1)
+    {
+        printf("\nSkew Heap Operations:\n");
+        printf("1. Insert\n");
+        printf("2. Delete Root\n");
+        printf("3. Search\n");
+        printf("4. In-order Traversal\n");
+        printf("5. Pre-order Traversal\n");
+        printf("6. Post-order Traversal\n");
+        printf("7. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                printf("Enter key to insert: ");
+                scanf("%d", &key);
+                root = insert(root, key);
+                break;
+            case 2:
+                root = deleteRoot(root);
+                break;
+            case 3:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+                if (search(root, key))
+                    printf("Key found in the heap.\n");
+                else
+                    printf("Key not found in the heap.\n");
+                break;
+            case 4:
+                printf("In-order Traversal: ");
+                inOrder(root);
+                printf("\n");
+                break;
+            case 5:
+                printf("Pre-order Traversal: ");
+                preOrder(root);
+                printf("\n");
+                break;
+            case 6:
+                printf("Post-order Traversal: ");
+                postOrder(root);
+                printf("\n");
+                break;
+            case 7:
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+[23bit088@mepcolinux ~]$cc skew.c
+[23bit088@mepcolinux ~]$./a.out
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 1
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 2
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 3
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 4
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 5
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 6
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 88
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 77
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 67
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 45
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 3
+Enter key to search: 88
+Key found in the heap.
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 34
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 1
+Enter key to insert: 90
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 2
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 4
+In-order Traversal: 45 6 5 67 3 88 34 2 90 4 77
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 5
+Pre-order Traversal: 2 3 5 6 45 67 34 88 4 90 77
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 6
+Post-order Traversal: 45 6 67 5 88 34 3 90 77 4 2
+
+Skew Heap Operations:
+1. Insert
+2. Delete Root
+3. Search
+4. In-order Traversal
+5. Pre-order Traversal
+6. Post-order Traversal
+7. Exit
+Enter your choice: 7
