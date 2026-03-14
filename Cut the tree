@@ -1,0 +1,154 @@
+\*
+Cut the Tree Problem
+
+The "Cut the Tree" problem involves finding the optimal edge to cut in an undirected tree to minimize the absolute difference between the sums of the resulting two subtrees.
+Problem Statement
+
+Given a tree with n nodes, each with a specific integer value, and a list of edges connecting the nodes:
+
+    Input:
+        An array of integers representing node values.
+        A list of edges defining the connections between nodes.
+
+    Objective:
+        Identify an edge to cut such that the absolute difference between the sums of the two resulting trees is minimized.
+
+Example
+
+For a tree with 6 nodes and the following values:
+
+    Node values: [100, 200, 100, 500, 100, 600]
+    Edges: [(1, 2), (2, 3), (2, 5), (4, 5), (5, 6)]
+
+Upon evaluating possible cuts:
+
+    Cutting different edges yields various absolute differences in sums.
+    The goal is to find the minimum absolute difference.
+
+Approach
+
+    Construct an adjacency list to represent the tree.
+    Calculate the total sum of all node values.
+    Use DFS (Depth-First Search) to explore each node:
+        For each edge cut, calculate the subtree sums.
+        Track the minimum absolute difference.
+    Return the smallest difference found.
+
+Complexity
+
+    Time Complexity: O(n), where n is the number of nodes (due to DFS).
+    Space Complexity: O(n) for the adjacency list and visited nodes.
+
+*/
+
+
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+class Result {
+
+    /*
+     * Complete the 'cutTheTree' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts following parameters:
+     *  1. INTEGER_ARRAY data
+     *  2. 2D_INTEGER_ARRAY edges
+     */
+
+    public static int cutTheTree(List<Integer> data, List<List<Integer>> edges) {
+    // Write your code here
+int n = data.size();
+        
+        // Building an adjacency list for the tree
+        List<List<Integer>> tree = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            tree.add(new ArrayList<Integer>()); // Specify Integer here
+        }
+        
+        for (List<Integer> edge : edges) {
+            int u = edge.get(0) - 1; // Convert to 0-based
+            int v = edge.get(1) - 1; // Convert to 0-based
+            tree.get(u).add(v);
+            tree.get(v).add(u);
+        }
+        
+        // Total sum of all node values
+        int totalSum = 0;
+        for (int value : data) {
+            totalSum += value;
+        }
+
+        boolean[] visited = new boolean[n];
+        int[] minDifference = { Integer.MAX_VALUE }; // Use array to store minDifference
+
+        // Perform DFS to calculate subtree sums
+        dfs(0, tree, data, visited, totalSum, minDifference);
+        
+        return minDifference[0];
+    }
+
+    private static int dfs(int node, List<List<Integer>> tree, List<Integer> data, boolean[] visited, int totalSum, int[] minDifference) {
+        visited[node] = true;
+        int subtreeSum = data.get(node);
+
+        for (int neighbor : tree.get(node)) {
+            if (!visited[neighbor]) {
+                subtreeSum += dfs(neighbor, tree, data, visited, totalSum, minDifference);
+            }
+        }
+
+        // After calculating the subtree sum, calculate the difference
+        int difference = Math.abs(totalSum - 2 * subtreeSum);
+        minDifference[0] = Math.min(minDifference[0], difference);
+
+        return subtreeSum;
+    }
+
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int n = Integer.parseInt(bufferedReader.readLine().trim());
+
+        String[] dataTemp = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+        List<Integer> data = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            int dataItem = Integer.parseInt(dataTemp[i]);
+            data.add(dataItem);
+        }
+
+        List<List<Integer>> edges = new ArrayList<>();
+
+        for (int i = 0; i < n - 1; i++) {
+            String[] edgesRowTempItems = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+            List<Integer> edgesRowItems = new ArrayList<>();
+
+            for (int j = 0; j < 2; j++) {
+                int edgesItem = Integer.parseInt(edgesRowTempItems[j]);
+                edgesRowItems.add(edgesItem);
+            }
+
+            edges.add(edgesRowItems);
+        }
+
+        int result = Result.cutTheTree(data, edges);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
