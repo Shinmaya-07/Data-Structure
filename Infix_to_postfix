@@ -1,0 +1,92 @@
+\* Code chef - difficulty -  1300
+Transform the Expression 
+Reverse Polish Notation (RPN) is a mathematical notation where every operator follows all of its operands. For instance, to add three and four, one would write "3 4 +" rather than "3 + 4". If there are multiple operations, the operator is given immediately after its second operand; so the expression written "3 − 4 + 5" would be written "3 4 − 5 +" first subtract 4 from 3, then add 5 to that.
+
+Transform the algebraic expression with brackets into RPN form.
+
+You can assume that for the test cases below only single letters will be used, brackets [] will not be used and each expression has only one RPN form (no expressions like a*b*c)
+Input Format
+    The first line contains t, the number of test cases (less then 100).
+    Followed by t lines, containing an expression to be translated to RPN form, where the length of the expression is less then 400.
+
+Output Format
+The expressions in RPN form, one per line.
+Sample 1:
+Input
+3
+(a+(b*c))
+((a+b)*(z+x))
+((a+t)*((b+(a+c))^(c+d)))
+Output
+abc*+
+ab+zx+*
+at+bac++cd+^*
+*/
+
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Codechef
+{
+    static int precedence(char ch) {
+        if (ch == '^') return 3;
+        if (ch == '*' || ch == '/') return 2;
+        if (ch == '+' || ch == '-') return 1;
+        return -1;
+    }
+
+    static String infixToPostfix(String exp) {
+        StringBuilder result = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < exp.length(); i++) {
+            char ch = exp.charAt(i);
+
+            if (Character.isLetterOrDigit(ch)) {
+                result.append(ch);
+            }
+
+            else if (ch == '(') {
+                stack.push(ch);
+            }
+
+            else if (ch == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    result.append(stack.pop());
+                }
+                stack.pop(); 
+            }
+
+            else {
+                while (!stack.isEmpty() &&
+                       precedence(stack.peek()) >= precedence(ch)) {
+                    result.append(stack.pop());
+                }
+                stack.push(ch);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            result.append(stack.pop());
+        }
+
+        return result.toString();
+    }
+
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		Scanner sc = new Scanner(System.in);
+
+		int t = sc.nextInt();
+		sc.nextLine();
+
+		while (t-- > 0) {
+			String exp = sc.nextLine();
+			System.out.println(infixToPostfix(exp));
+		}
+
+		sc.close();
+	}
+}
