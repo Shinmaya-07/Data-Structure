@@ -1,0 +1,101 @@
+\* Code chef - Difficulty 1200
+Stone Pile
+
+Aman and Akshat are trying to solve a task given to them by their teacher. They are given a pile of stones containing NN stones with an integer written on each of them. There are two different kinds of moves that can be performed on the pile :
+    Player will remove a stone from the toptop of the pile and put it back on the bottombottom of the pile
+    Player will remove a stone from the toptop of the pile and throwthrow it away.
+
+Aman in his turn will perform move 11 once and then move 22 once. Akshat in his turn will perform move 11 twice and then move 22 once.
+They will stop making moves when there is only 11 stone left in the pile.
+Both of them gets turn alternatively with Aman going first. Find the person performing the last move and the number written on the last stone left in the pile.
+The stones at index i′thi′th is located higher than the stones at index j′thj′th , such that (i<j)(i<j)
+Input Format
+
+    The first line contains an integer TT, representing TT Testcases.
+    The first line of each test case contains an integer NN, representing the size of Array AA.
+    The second line of each test case contains NN integer, representing array AA
+
+Output Format
+    For each test case, Print 22 space-separated integer representing the person making the last move (11 for Aman and 00 for Akshat) and the number written on the stone remaining.
+
+Constraints
+
+    1≤T≤1001≤T≤100
+    2≤N≤1000002≤N≤100000
+    −109≤Ai≤109−109≤Ai​≤109
+    Sum of NN over all test cases does not exceed 106106
+
+Sample 1:
+Input:
+3
+3
+-5 0 5
+4 
+-1 -3 2 4
+6
+-100000 0 0 100000 -1000000 1000000
+Output:
+0 -5
+1 2
+1 0
+
+Explanation:
+In the first test case,
+Aman removes the stone −5−5 and put it at the bottom making the pile {0,5,−5}{0,5,−5}.
+Aman then removes the stone 00 and throw it away making the pile {5,−5}{5,−5}.
+Akshat then removes 55 from the top and put it at the bottom of the pile making the pile {−5,5}{−5,5}.
+Akshat then removes −5−5 from the top and put it at the bottom of the pile making the pile {5,−5}{5,−5}.
+Akshat then removes the stone 55 and throw it away making the pile {−5}{−5}.
+The last stone remaining has −5−5 written on it.
+
+In the second test case, Aman removes the second last stone, and the last stone remaining has 22 written on it.
+In the third test case, Aman removes the second last stone, and the last stone remaining has 00 written on it.
+
+*/
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+
+class Codechef
+{
+	public static void main (String[] args) throws java.lang.Exception
+	{
+		Scanner sc = new Scanner(System.in);
+
+        int T = sc.nextInt();
+
+        while (T-- > 0) {
+            int n = sc.nextInt();
+
+            Queue<Integer> q = new LinkedList<>();
+
+            for (int i = 0; i < n; i++) {
+                q.add(sc.nextInt());
+            }
+
+            boolean amanTurn = true; 
+
+            while (q.size() > 1) {
+
+                if (amanTurn) {
+                    q.add(q.poll());
+
+                    q.poll();
+                } 
+                else {
+                    q.add(q.poll());
+
+                    q.add(q.poll());
+
+                    q.poll();
+                }
+
+                amanTurn = !amanTurn;
+            }
+            int lastPlayer = amanTurn ? 0 : 1;
+            System.out.println(lastPlayer + " " + q.peek());
+        }
+        sc.close();
+	}
+}
